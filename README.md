@@ -1,5 +1,3 @@
-# vida-de-PJ
-
 # Calculadora CLT para PJ
 
 Uma calculadora web interativa para comparar salários entre regimes CLT e PJ, incluindo benefícios, impostos e custos do empregador. Desenvolvida com HTML, JavaScript e Tailwind CSS.
