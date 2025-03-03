@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora CLT para PJ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        border: "rgb(226 232 240)",
+                        input: "rgb(226 232 240)",
+                        ring: "rgb(59 130 246)",
+                        background: "rgb(255 255 255)",
+                        foreground: "rgb(15 23 42)",
+                        primary: {
+                            DEFAULT: "rgb(59 130 246)",
+                            foreground: "rgb(255 255 255)",
+                        },
+                        secondary: {
+                            DEFAULT: "rgb(226 232 240)",
+                            foreground: "rgb(15 23 42)",
+                        },
+                        destructive: {
+                            DEFAULT: "rgb(239 68 68)",
+                            foreground: "rgb(255 255 255)",
+                        },
+                        muted: {
+                            DEFAULT: "rgb(241 245 249)",
+                            foreground: "rgb(100 116 139)",
+                        },
+                        accent: {
+                            DEFAULT: "rgb(241 245 249)",
+                            foreground: "rgb(15 23 42)",
+                        },
+                        success: {
+                            DEFAULT: "rgb(34 197 94)",
+                            foreground: "rgb(255 255 255)",
+                        },
+                        warning: {
+                            DEFAULT: "rgb(251 191 36)",
+                            foreground: "rgb(15 23 42)",
+                        }
+                    },
+                    borderRadius: {
+                        lg: "0.5rem",
+                        md: "calc(0.5rem - 2px)",
+                        sm: "calc(0.5rem - 4px)",
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-full bg-gradient-to-b from-slate-50 to-slate-100 p-4 md:p-8">
+    <div class="container mx-auto max-w-7xl">
+        <!-- Header -->
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-foreground mb-2">Calculadora CLT para PJ</h1>
+            <p class="text-muted-foreground">Compare salários e benefícios entre regimes CLT e PJ</p>
+        </header>
+
+        <div class="grid gap-8 md:grid-cols-2">
+            <!-- Formulário Principal -->
+            <div class="rounded-lg bg-white shadow-lg">
+                <div class="border-b border-border p-6">
+                    <h2 class="flex items-center gap-2 text-xl font-semibold text-foreground">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                        Dados Salariais
+                    </h2>
+                    <p class="mt-2 text-sm text-muted-foreground">Informe seus dados salariais e benefícios atuais</p>
+                </div>
+                <div class="p-6">
+                    <form id="salary-form" class="space-y-6">
+                        <!-- Salário CLT -->
+                        <div class="space-y-2">
+                            <label for="clt-salary" class="flex items-center text-sm font-medium text-foreground">
+                                Salário CLT Bruto
+                                <div class="relative ml-2" data-tooltip="Salário bruto mensal sem benefícios">
+                                    <span class="cursor-help text-muted-foreground">ⓘ</span>
+                                </div>
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    id="clt-salary" 
+                                    name="clt-salary"
+                                    class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" 
+                                    placeholder="R$ 0,00" 
+                                    required
+                                    aria-describedby="clt-salary-error"
+                                >
+                                <div id="clt-salary-error" class="mt-1 text-sm text-destructive"></div>
+                            </div>
+                        </div>
+
+                        <!-- Dependentes -->
+                        <div class="space-y-2">
+                            <label for="dependents" class="flex items-center text-sm font-medium text-foreground">
+                                Número de Dependentes
+                                <div class="relative ml-2" data-tooltip="Dependentes para dedução do IR">
+                                    <span class="cursor-help text-muted-foreground">ⓘ</span>
+                                </div>
+                            </label>
+                            <input 
+                                type="number" 
+                                id="dependents" 
+                                name="dependents"
+                                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" 
+                                min="0" 
+                                value="0"
+                            >
+                        </div>
+
+                        <!-- Benefícios -->
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2 text-lg font-semibold text-foreground">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                        <path d="M2 17l10 5 10-5"></path>
+                                        <path d="M2 12l10 5 10-5"></path>
+                                    </svg>
+                                    Benefícios
+                                </div>
+                                <button 
+                                    type="button" 
+                                    id="add-benefit"
+                                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                    Adicionar Benefício
+                                </button>
+                            </div>
+                            <div id="benefits-list" class="space-y-2">
+                                <!-- Benefícios serão adicionados aqui -->
+                            </div>
+                        </div>
+
+                        <!-- Regime Tributário -->
+                        <div class="space-y-4">
+                            <label class="text-sm font-medium text-foreground">Regime Tributário PJ</label>
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div class="cursor-pointer rounded-lg border border-primary bg-primary/5 p-4 transition-colors" data-regime="simples">
+                                    <h4 class="text-sm font-medium text-foreground">Simples Nacional</h4>
+                                    <p class="mt-1 text-xs text-muted-foreground">Alíquota padrão: 6%</p>
+                                </div>
+                                <div class="cursor-pointer rounded-lg border border-input bg-background p-4 transition-colors hover:border-primary hover:bg-primary/5" data-regime="presumido">
+                                    <h4 class="text-sm font-medium text-foreground">Lucro Presumido</h4>
+                                    <p class="mt-1 text-xs text-muted-foreground">Alíquota padrão: 13.33%</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label for="tax-rate" class="flex items-center text-sm font-medium text-foreground">
+                                    Alíquota Personalizada
+                                    <div class="relative ml-2" data-tooltip="Alíquota total de impostos do regime escolhido">
+                                        <span class="cursor-help text-muted-foreground">ⓘ</span>
+                                    </div>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="tax-rate" 
+                                    name="tax-rate"
+                                    class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" 
+                                    placeholder="6.00%" 
+                                    value="6.00%"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Botões -->
+                        <div class="flex gap-4">
+                            <button 
+                                type="submit" 
+                                class="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+                            >
+                                Calcular Valores
+                            </button>
+                            <button 
+                                type="button" 
+                                onclick="resetForm()" 
+                                class="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground hover:bg-secondary/90 h-10 px-4 py-2"
+                            >
+                                Limpar Formulário
+                            </button>
+                        </div>
+                    </form>
+                    <div id="error-message" class="mt-4 text-sm text-destructive"></div>
+                </div>
+            </div>
+
+            <!-- Resultados -->
+            <div class="rounded-lg bg-white shadow-lg">
+                <div class="border-b border-border">
+                    <div class="flex border-b border-border">
+                        <button class="border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary" data-tab="summary">Resumo</button>
+                        <button class="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground" data-tab="details">Detalhes</button>
+                        <button class="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground" data-tab="info">Informações</button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <!-- Tab Resumo -->
+                    <div id="tab-summary" class="space-y-6">
+                        <!-- CLT -->
+                        <div class="rounded-lg bg-primary/5 border border-primary/20 p-4">
+                            <h3 class="text-lg font-semibold text-foreground">Regime CLT</h3>
+                            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                                <div class="rounded-lg bg-white p-4 shadow-sm">
+                                    <div class="text-sm text-muted-foreground">Salário Bruto</div>
+                                    <div class="mt-1 text-xl font-semibold text-foreground" id="clt-gross">R$ 0,00</div>
+                                </div>
+                                <div class="rounded-lg bg-white p-4 shadow-sm">
+                                    <div class="text-sm text-muted-foreground">Descontos</div>
+                                    <div class="mt-1 text-xl font-semibold text-foreground" id="clt-discounts">R$ 0,00</div>
+                                </div>
+                                <div class="rounded-lg bg-white p-4 shadow-sm">
+                                    <div class="text-sm text-muted-foreground">Benefícios</div>
+                                    <div class="mt-1 text-xl font-semibold text-foreground" id="clt-benefits">R$ 0,00</div>
+                                </div>
+                                <div class="rounded-lg bg-white p-4 shadow-sm">
+                                    <div class="text-sm text-muted-foreground">Líquido Total</div>
+                                    <div class="mt-1 text-xl font-semibold text-primary" id="clt-liquid">R$ 0,00</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PJ -->
+                        <div class="rounded-lg bg-success/5 border border-success/20 p-4">
+                            <h3 class="text-lg font-semibold text-foreground">Regime PJ</h3>
+                            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                                <div class="rounded-lg bg-white p-4 shadow-sm">
+                                    <div class="text-sm text-muted-foreground">Faturamento Mensal</div>
+                                    <div class="mt-1 text-xl font-semibold text-foreground" id="pj-gross">R$ 0,00</div>
+                                </div>
+                                <div class="rounded-lg bg-white p-4 shadow-sm">
+                                    <div class="text-sm text-muted-foreground">Impostos</div>
+                                    <div class="mt-1 text-xl font-semibold text-foreground" id="pj-tax">R$ 0,00</div>
+                                </div>
+                                <div class="col-span-2">
+                                    <div class="rounded-lg bg-white p-4 shadow-sm">
+                                        <div class="text-sm text-muted-foreground">Líquido Total</div>
+                                        <div class="mt-1 text-xl font-semibold text-success" id="pj-liquid">R$ 0,00</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Custo Empregador -->
+                        <div class="rounded-lg bg-warning/5 border border-warning/20 p-4">
+                            <h3 class="text-lg font-semibold text-foreground flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
+                                    <path d="M20.91 8.84 8.56 2.23a1.93 1.93 0 0 0-1.81 0L3.1 4.13a2.12 2.12 0 0 0-.05 3.69l12.22 6.93a2 2 0 0 0 1.94 0L21 12.51a2.12 2.12 0 0 0-.09-3.67Z"></path>
+                                    <path d="m3.09 8.84 12.35-6.61a1.93 1.93 0 0 1 1.81 0l3.65 1.9a2.12 2.12 0 0 1 .1 3.69L8.73 14.75a2 2 0 0 1-1.94 0L3 12.51a2.12 2.12 0 0 1 .09-3.67Z"></path>
+                                    <line x1="12" y1="22" x2="12" y2="13"></line>
+                                </svg>
+                                Custo Total para Empregador
+                            </h3>
+                            <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                                <div class="rounded-lg bg-white p-4 shadow-sm">
+                                    <div class="text-sm text-muted-foreground">INSS Patronal (20%)</div>
+                                    <div class="mt-1 text-xl font-semibold text-foreground" id="employer-inss">R$ 0,00</div>
+                                </div>
+                                <div class="rounded-lg bg-white p-4 shadow-sm">
+                                    <div class="text-sm text-muted-foreground">Outros Encargos</div>
+                                    <div class="mt-1 text-xl font-semibold text-foreground" id="employer-other">R$ 0,00</div>
+                                </div>
+                                <div class="rounded-lg bg-white p-4 shadow-sm">
+                                    <div class="text-sm text-muted-foreground">Custo Total Mensal</div>
+                                    <div class="mt-1 text-xl font-semibold text-warning" id="employer-total">R$ 0,00</div>
+                                </div>
+                            </div>
+                            <p class="mt-4 text-sm text-muted-foreground">
+                                * Inclui salário, encargos patronais (INSS 20%, RAT/SAT ~2%, Sistema S ~5.8%), provisões (13º, férias) e benefícios
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Tab Detalhes -->
+                    <div id="tab-details" class="hidden space-y-6">
+                        <!-- Detalhamento CLT -->
+                        <div class="rounded-lg bg-primary/5 border border-primary/20 p-4">
+                            <h3 class="text-lg font-semibold text-foreground">Detalhamento CLT</h3>
+                            <div class="mt-4 overflow-hidden rounded-lg border border-border">
+                                <table class="w-full">
+                                    <tbody class="divide-y divide-border">
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">Salário Base</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground" id="detail-salary">R$ 0,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">INSS</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground" id="detail-inss">R$ 0,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">Base IR</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground" id="detail-ir-base">R$ 0,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">IR</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground" id="detail-ir">R$ 0,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">FGTS Mensal</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground" id="detail-fgts">R$ 0,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">Férias Proporcionais</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground" id="detail-vacation">R$ 0,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">13º Proporcional</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground" id="detail-13">R$ 0,00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Benefícios Detalhados -->
+                        <div class="rounded-lg bg-primary/5 border border-primary/20 p-4">
+                            <h3 class="text-lg font-semibold text-foreground">Benefícios Detalhados</h3>
+                            <div class="mt-4 overflow-hidden rounded-lg border border-border">
+                                <table class="w-full" id="benefits-table">
+                                    <thead class="bg-muted">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-sm font-medium text-foreground">Benefício</th>
+                                            <th class="px-4 py-2 text-left text-sm font-medium text-foreground">Valor Mensal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-border">
+                                        <!-- Benefícios serão listados aqui -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Informações -->
+                    <div id="tab-info" class="hidden space-y-6">
+                        <!-- Faixas INSS -->
+                        <div class="rounded-lg bg-primary/5 border border-primary/20 p-4">
+                            <h3 class="text-lg font-semibold text-foreground">Faixas INSS 2025</h3>
+                            <div class="mt-4 overflow-hidden rounded-lg border border-border">
+                                <table class="w-full">
+                                    <thead class="bg-muted">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-sm font-medium text-foreground">Faixa Salarial</th>
+                                            <th class="px-4 py-2 text-left text-sm font-medium text-foreground">Alíquota</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-border">
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">Até R$ 1.518,00</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">7,5%</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">De R$ 1.518,01 até R$ 2.793,88</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">9%</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">De R$ 2.793,89 até R$ 4.190,83</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">12%</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">De R$ 4.190,84 até R$ 8.157,41</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">14%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Faixas IR -->
+                        <div class="rounded-lg bg-primary/5 border border-primary/20 p-4">
+                            <h3 class="text-lg font-semibold text-foreground">Faixas IR 2025</h3>
+                            <div class="mt-4 overflow-hidden rounded-lg border border-border">
+                                <table class="w-full">
+                                    <thead class="bg-muted">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-sm font-medium text-foreground">Base de Cálculo</th>
+                                            <th class="px-4 py-2 text-left text-sm font-medium text-foreground">Alíquota</th>
+                                            <th class="px-4 py-2 text-left text-sm font-medium text-foreground">Dedução</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-border">
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">Até R$ 2.259,20</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">0%</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">R$ 0,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">De R$ 2.259,21 a R$ 2.824,00*</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">0%</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">R$ 564,80</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">De R$ 2.259,21 a R$ 2.828,65</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">7,5%</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">R$ 169,44</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">De R$ 2.828,66 até R$ 3.751,05</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">15%</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">R$ 381,44</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">De R$ 3.751,06 até R$ 4.664,68</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">22,5%</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">R$ 662,77</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm text-muted-foreground">Acima de R$ 4.664,68</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">27,5%</td>
+                                            <td class="px-4 py-2 text-sm font-medium text-foreground">R$ 896,00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="mt-2 px-4 py-2 text-sm text-muted-foreground">* Desconto especial de R$ 564,80 aplicável quando vantajoso</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar Benefício -->
+    <div id="benefit-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+        <div class="w-full max-w-md rounded-lg bg-white shadow-xl">
+            <div class="flex items-center justify-between border-b border-border p-6">
+                <h3 class="text-lg font-semibold text-foreground">Adicionar Benefício</h3>
+                <button type="button" onclick="closeModal()" class="rounded-full p-2 hover:bg-muted">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <label for="benefit-name" class="text-sm font-medium text-foreground">Nome do Benefício</label>
+                        <input type="text" id="benefit-name" class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" placeholder="Ex: Vale Refeição">
+                    </div>
+                    <div class="space-y-2">
+                        <label for="benefit-value" class="text-sm font-medium text-foreground">Valor Mensal</label>
+                        <input type="text" id="benefit-value" class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" placeholder="R$ 0,00">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="benefit-taxable" class="h-4 w-4 rounded border-input">
+                        <label for="benefit-taxable" class="text-sm text-foreground">Benefício Tributável</label>
+                        <div class="relative ml-2" data-tooltip="Benefícios tributáveis são incluídos na base de cálculo do INSS e IR">
+                            <span class="cursor-help text-muted-foreground">ⓘ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-4 border-t border-border p-6">
+                <button type="button" onclick="closeModal()" class="rounded-lg border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
+                    Cancelar
+                </button>
+                <button type="button" onclick="saveBenefit()" class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+                    Adicionar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensagem de Sucesso -->
+    <div class="fixed bottom-4 right-4 z-50">
+        <div id="success-message" class="hidden rounded-lg bg-success/10 p-4 text-success">
+            Cálculo realizado com sucesso!
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/scripts.js"></script>
+</body>
+</html>
